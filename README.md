@@ -1,2 +1,1 @@
-# video-dataset-creator
-Projeto Final de Programação
+# RNP videos donwloader and analysis
