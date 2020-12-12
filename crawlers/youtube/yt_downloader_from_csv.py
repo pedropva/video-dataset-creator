@@ -1,87 +1,138 @@
-import subprocess as sp
 import os
 import youtube_dl
+import argparse
 from multiprocessing import Pool
 from time import sleep
 
-saveDir = '/media/pedropva/proper_videos/yt_videos/'
 
+# https://www.youtube.com/watch?v=sQ3aeclQ3QA
+# /media/pedropva/datasets/yt_videos/sQ3aeclQ3QA.mp4
+def already_downloaded(url: str, save_dir: str):
+    '''Checks (from the url) if a video was already downloaded in the save save_dir.
 
-#https://www.youtube.com/watch?v=sQ3aeclQ3QA                                                   
-#/media/pedropva/datasets/yt_videos/sQ3aeclQ3QA.mp4
-def already_downloaded(url):
+    :param url: Youtube Url for the video.
+    :type url: str, optional
+
+    :param save_dir: Path to where the videos are saved.
+    :type save_dir: str, optional
+
+    :returns: A boolean, True if the video already exists in the save dir, False otherwise.
+    :rtype: bool
+    '''
     video_id = url.split('v=')[-1]
-    video_path = saveDir + video_id
-    if os.path.isfile(video_path+'.mp4') or os.path.isfile(video_path+'.webm'):
+    video_path = save_dir + video_id
+    if os.path.isfile(video_path + '.mp4') or os.path.isfile(video_path + '.webm'):
         return True
     else:
-        #print(video_id,': ', url)
         return False
 
-def download(url):
+
+def download(url: str, save_dir: str):
+    '''Downloads a video from the provided url.
+
+    :param url: Youtube Url for the video.
+    :type url: str, optional
+
+    :param save_dir: Path to where the videos are saved.
+    :type save_dir: str, optional
+
+    :returns: A boolean, True if the it had success downloading the video, False otherwise.
+    :rtype: bool
+    '''
     try:
         options = {
-            #'verbose': True,
+            # 'verbose': True,
             'format': 'best',
-            'outtmpl': saveDir + '%(id)s.%(ext)s',
-            #"source_address": "10.0.0.4",
-            #'verbose':False,
-            #'progress_hooks': [my_hook],
-            #'noplaylist' : True,
-            #'postprocessors': [{
+            'outtmpl': save_dir + '%(id)s.%(ext)s',
+            # "source_address": "10.0.0.4",
+            # 'verbose':False,
+            # 'progress_hooks': [my_hook],
+            # 'noplaylist' : True,
+            # 'postprocessors': [{
             #    'key': 'FFmpegExtractAudio',
             #    'preferredcodec': 'mp3',
-            #}],
+            # }],
         }
         with youtube_dl.YoutubeDL(options) as ydl:
-            #result = ydl.download([url])
-            result = ydl.extract_info(url, download=True)#'https://www.youtube.com/watch?v=9bZkp7q19f0'
-        
-        filepath = saveDir + result['display_id']+'.'+result['ext']
+            # result = ydl.download([url])
+            result = ydl.extract_info(url, download=True)
+
+        filepath = save_dir + result['display_id'] + '.' + result['ext']
         print('downloaded: ', filepath)
         return True
-    except Exception as e: 
+    except Exception as e:
         print(e)
         return False
 
-raw = open('valid_urls_2.csv').read().split('\n')
-raw = [v for v in raw if v!='']
-#raw = raw[:5500]
+def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int =30):
+    '''Downloads a video from a csv containing youtube urls. One url per line.
 
-while(True):
-    urls_to_download = []
-    fails_sequence = 0 
-    success_count = 0
+    :param csv_path: Path to the csv file with the urls to youtube.
+    :type csv_path: str, optional
 
-    for url in raw:
-        if already_downloaded(url):
-            success_count += 1
-        else:
-            urls_to_download.append(url)
+    :param save_dir: Path to where the videos are saved.
+    :type save_dir: str, optional
 
-    print(f"{success_count} Videos already downloaded!")
-    if len(urls_to_download) == 0:
-        break
-    #break
-    # p = Pool(32)
-    # p.starmap(download, zip(urls_to_download))
+    :param wait_time: Wait time between requests, use it to not get blocked for too many requests.
+    :type wait_time: int, optional
 
+    :returns: A boolean, True if the it had success downloading the video, False otherwise.
+    :rtype: bool
+    '''
 
-    for url in urls_to_download:
-        print(url)
-        result = download(url)
-        if not result:
-            print('### Failed downloading video! ###')
-            fails_sequence +=1
-        else:
-            success_count += 1
-            fails_sequence = 0
+    # Creating the save save_dir
+    if not os.path.exists(save_dir):
+        print("Save dir not found, creating save dir in:", save_dir)
+        os.makedirs(save_dir)
 
-            wait_time = 30
-            sleep(wait_time) # Time in seconds
+    # Reading the csv file
+    raw = open(csv_path).read().split('\n')
+    raw = [v.replace(',', '') for v in raw if v != '']
+    # raw = raw[:5500]
 
-        if(fails_sequence > 100):#if we failed more than 100 times, then just give up and try next time  
-            break
-    print(f'there were {success_count} out of {len(raw)} videos downloaded!')
-    wait_time = 60 * 5
-    sleep(wait_time) # Time in seconds
+    urls_to_download = [url for url in raw if already_downloaded(url)]
+    print(f"{len(raw) - len(urls_to_download)} Videos already downloaded!")
+
+    # try to download all urls until many consecutive fails or done dowloading all.
+    while (len(urls_to_download) > 0):
+        fails_sequence = 0
+        failed_urls = []
+        # Uncomment this part and comment the 'for' for multi threading
+        # p = Pool(32)
+        # p.starmap(download, zip(urls_to_download))
+
+        # Try to download each video
+        for url in urls_to_download:
+            print('Downloading from url:', url)
+            result = download(url)
+            if not result:
+                print('### Failed downloading video! ###')
+                fails_sequence += 1
+                failed_urls.append(url)
+            else:
+                fails_sequence = 0
+
+                sleep(30)
+
+            if (fails_sequence > 100):  # if we failed more than N times, then just give up and try next time
+                break
+
+        urls_to_download = failed_urls
+        print(f'There are {len(raw) - len(urls_to_download)} out of {len(raw)} videos downloaded!')
+
+        sleep(wait_time)
+
+if __name__ == "__main__":
+    # Defining the script's arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("csv_path", type=str,
+                        help="Path to the csv file containing a youtube url per line")
+    parser.add_argument("save_dir", type=str,
+                        help="The path to the save_dir in which to save the downloads", default='./yt_downloads/')
+
+    # Parsing arguments
+    args = parser.parse_args()
+
+    wait_time = 60 * 5  # Time in seconds
+
+    read_csv_and_download_videos(args.csv_path, args.save_dir, wait_time)
