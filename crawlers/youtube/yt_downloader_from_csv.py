@@ -129,10 +129,11 @@ if __name__ == "__main__":
                         help="Path to the csv file containing a youtube url per line")
     parser.add_argument("save_dir", type=str,
                         help="The path to the save_dir in which to save the downloads", default='./yt_downloads/')
+    parser.add_argument("--wait",
+                        help="Time in seconds to wait between downloads (so not to overload youtube)",
+                        default=10)
 
     # Parsing arguments
     args = parser.parse_args()
 
-    wait_time = 60 * 5  # Time in seconds
-
-    read_csv_and_download_videos(args.csv_path, args.save_dir, wait_time)
+    read_csv_and_download_videos(args.csv_path, args.save_dir, args.wait)

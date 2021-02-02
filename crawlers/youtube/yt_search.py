@@ -35,14 +35,14 @@ def search(query: list, save_dir: str, max_n, wait_time: int = 10):
                 'format': 'best',
                 "simulate": False,
                 "default_search": f"ytsearch{max_n}",
-                'outtmpl': save_dir + '%(id)s.%(ext)s',
+                'outtmpl': save_dir + '/' + '%(id)s.%(ext)s',
             }
     ) as ydl:
         # result = ydl.extract_info(query,download=False) # Uncomment this if we just want to extract the info
         ydl.download(query)  # Comment this if you dont want to download the video
 
 
-def main(query_word: str, save_dir: str, max_n):
+def main(query_word: str, save_dir: str, max_n, wait_time: int = 10):
     '''Performs a query in youtube then downloads every video to the save save_dir.
 
     :param query_word: The query string, can only be a single string (e.g. "beach") .
@@ -54,11 +54,13 @@ def main(query_word: str, save_dir: str, max_n):
     :param max_n: Max number of videos to download. It can be a number or simply 'all'
     :type max_n: Any, optional
 
+    :param wait_time: Wait time between requests, use it to not get blocked for too many requests.
+    :type wait_time: int, optional
+
     :returns: None, It automatically saves the videos to the save save_dir.
     :rtype: None
     '''
-    # General variables
-    wait_time = 60 * 4
+    # Create save dir
     save_dir = save_dir + '/' + query_word + '_videos'
 
     # Creating the save save_dir
@@ -72,15 +74,21 @@ def main(query_word: str, save_dir: str, max_n):
 
 if __name__ == "__main__":
     # Defining the script's arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("query_word", type=str,
+    parser = argparse.ArgumentParser(description='Search and download youtube videos.')
+    parser.add_argument("query_word",
+                        type=str,
                         help="Search term to query in youtube (Only one search term at a time)")
-    parser.add_argument("save_dir", type=str,
+    parser.add_argument("save_dir",
+                        type=str,
                         help="The path to the save_dir in which to save the downloads")
-    parser.add_argument("-n", "number",
-                        help="Max number of videos to download", default=1000)
+    parser.add_argument("--number",
+                        help="Max number of videos to download",
+                        default=2000)
+    parser.add_argument("--wait",
+                        help="Time in seconds to wait between downloads (so not to overload youtube)",
+                        default=10)
 
     # Parsing arguments
     args = parser.parse_args()
     # Calling main function
-    main(args.query_word, args.save_dir, args.number)
+    main(args.query_word, args.save_dir, args.number, args.wait)
