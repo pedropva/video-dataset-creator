@@ -11,7 +11,7 @@ CLIENT_KEY = None
 
 
 def sizeof_fmt(n_bytes: int, suffix: str = 'B'):
-    '''Formats number of bytes to a human readable unity.
+    """Formats number of bytes to a human readable string.
 
     :param n_bytes: Number of bytes to format.
     :type n_bytes: int, optional
@@ -21,16 +21,54 @@ def sizeof_fmt(n_bytes: int, suffix: str = 'B'):
 
     :returns: A string with human readable representation of a set amount of bits.
     :rtype: str
-    '''
+    """
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(n_bytes) < 1024.0:
-            return "%3.1f%s%s" % (n_bytes, unit, suffix)
+            return "%3.1f %s%s" % (n_bytes, unit, suffix)
         n_bytes /= 1024.0
-    return "%.1f%s%s" % (n_bytes, 'Yi', suffix)
+    return "%.1f %s%s" % (n_bytes, 'Yi', suffix)
+
+
+def scandown(elements, indent=0):
+    """Scan and print a xml tree
+
+    :param elements: a Xml.dom node or a list of nodes.
+
+    :param indent: How much to ident in each branch.
+    :type indent: int, optional
+
+    :returns: It just prints all nodes.
+    """
+    if not isinstance(elements, list) and elements:
+        log("   " * indent + "nodeName: " + str(elements.nodeName))
+        log("   " * indent + "nodeValue: " + str(elements.nodeValue))
+        log("   " * indent + "childNodes: " + str(elements.childNodes))
+        scandown(elements.childNodes, indent + 1)
+    else:
+        for el in elements:
+            log("   " * indent + "nodeName: " + str(el.nodeName))
+            log("   " * indent + "nodeValue: " + str(el.nodeValue))
+            log("   " * indent + "childNodes: " + str(el.childNodes))
+            scandown(el.childNodes, indent + 1)
+
+
+def log(string: str, file=None):
+    """Rudimentary logging function.
+
+     :param string: What string to log.
+     :type string: str, optional
+
+     :param file: Reference to a open file where to write.
+
+     :returns: It just prints or writes the string to a file.
+     """
+    print(string)
+    if file:
+        file.write(string + '\n')
 
 
 def downloadFile(url: str, save_dir: str, local_filename: str = None, verbose: bool = True):
-    '''Downloads a file from the provided url.
+    """Downloads a file from the provided url.
 
     :param url: Url for the file.
     :type url: str, optional
@@ -46,14 +84,14 @@ def downloadFile(url: str, save_dir: str, local_filename: str = None, verbose: b
 
     :returns: The size in bytes of the downloaded content, if it failed, size will be zero.
     :rtype: int
-    '''
+    """
 
     if not local_filename:
         local_filename = url.split('/')[-1]
     localFilePath = save_dir + '/' + local_filename
     if os.path.exists(localFilePath):
         file_size = os.path.getsize(localFilePath)
-        if file_size <= 150:
+        if file_size >= 150:
             print("Already downloaded, skipping!")
             return file_size
     with open(localFilePath, 'wb') as f:
@@ -81,44 +119,15 @@ def downloadFile(url: str, save_dir: str, local_filename: str = None, verbose: b
         return int(r.headers.get('content-length'))
 
 
-def scandown(elements, indent):
-    '''Scan and print a xml tree
-
-    :param elements: Xml.dom nodes.
-
-    :param indent: How much to ident in each branch.
-    :type indent: int, optional
-
-    :returns: It just prints all nodes.
-    '''
-
-    for el in elements:
-        log("   " * indent + "nodeName: " + str(el.nodeName))
-        log("   " * indent + "nodeValue: " + str(el.nodeValue))
-        log("   " * indent + "childNodes: " + str(el.childNodes))
-        scandown(el.childNodes, indent + 1)
-
-
-def log(string: str, file=None):
-    '''Rudimentary logging function.
-
-     :param string: What string to log.
-     :type string: str, optional
-
-     :param file: Reference to a open file where to write.
-
-     :returns: It just prints or writes the string to a file.
-     '''
-    print(string)
-    if file:
-        file.write(string + '\n')
-
-
-def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: int, save_dir: str):
-    '''Crawls the Video@RNP API, collecting and downloading video data.
+def crawl_and_download(client_key: str, save_dir: str, start_id: int = None, start_index: int = 0, max_n: int = 10,
+                       log_file_path=None):
+    """Crawls the Video@RNP API, collecting and downloading video data.
 
     :param client_key: The client key provided by the API Admin (Video@RNP).
-    :type client_key: str, optional
+    :type client_key: str
+
+    :param save_dir: Path to where the file will be saved.
+    :type save_dir: str
 
     :param start_id: The Downloader will start the downloads from this video id.
     :type start_id: str, optional
@@ -129,12 +138,12 @@ def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: 
     :param max_n: Max number of videos to download.
     :type max_n: int, optional
 
-    :param save_dir: Path to where the file will be saved.
-    :type save_dir: str, optional
+    :param log_file_path: Path to save the logs. Optional. e.g. "./"
+    :type log_file_path: int, optional
 
     :returns: None, It automatically saves the videos to the save save_dir.
     :rtype: None
-    '''
+    """
 
     # Defining the requests user agent and headers
     PARAMS = {'limit': max_n}  # {'address': location}
@@ -153,6 +162,7 @@ def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: 
     #   f.close() #to change file access modes
     PARAMS = {}
     SAVE_DIR = save_dir
+    LOG_NAME = 'probing.log'
     videos_tag = xml.childNodes[0]
     videos_nodes = videos_tag.childNodes
     total_size = 0
@@ -160,11 +170,17 @@ def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: 
     denied_requests = 0
     successful_requests = 0
 
-    with open('probing.log', 'a+') as file:
-        log(f'Starting run for probing {len(videos_nodes)} videos! At {datetime.datetime.now()}', file)
+    if log_file_path:
+        with open(os.path.join(log_file_path, LOG_NAME), 'a+') as log_file:
+            log(f'Starting run for probing {len(videos_nodes)} videos! At {datetime.datetime.now()}', log_file)
+    else:
+        log(f'Starting run for probing {len(videos_nodes)} videos! At {datetime.datetime.now()}')
 
     for i, video_node in enumerate(videos_nodes):
-        file = open('probing.log', 'a+')
+        if log_file_path:
+            log_file = open(os.path.join(log_file_path, LOG_NAME), 'a+')
+        else:
+            log_file = None
         video_id = video_node.childNodes[0].childNodes[0].nodeValue
         if i < start_index:
             # print(f'Jumping index {i} until {start_index}.')
@@ -177,9 +193,9 @@ def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: 
                 start_id = None  # if we already passed our starting point, then we dont need to test forom now on
 
         if (i % 10 == 0) and (i != 0):
-            log(f'{failed_requests}/{len(videos_nodes)} failed until now.', file)
-            log(f'{denied_requests}/{len(videos_nodes)} denied until now.', file)
-            log(f'{successful_requests}/{len(videos_nodes)} successful until now.', file)
+            log(f'{failed_requests}/{len(videos_nodes)} failed until now.', log_file)
+            log(f'{denied_requests}/{len(videos_nodes)} denied until now.', log_file)
+            log(f'{successful_requests}/{len(videos_nodes)} successful until now.', log_file)
 
         time.sleep(50)
         # if len(glob.glob(SAVE_DIR +'/'+video_id+'*')) > 0:
@@ -192,22 +208,24 @@ def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: 
             print(e)
             continue
         if r.status_code != 200:
-            log(f'Video {i}/{len(videos_nodes)}, Id:{video_id}, error in request: {r.status_code} {r.reason}.', file)
+            log(f'Video {i}/{len(videos_nodes)}, Id:{video_id}, error in request: {r.status_code} {r.reason}.',
+                log_file)
             failed_requests += 1
             continue
 
         xml = minidom.parseString(r.text)
         versions = xml.childNodes[0]
         best_version = versions.childNodes[0]
-        # scandown(best_version.childNodes,0)
+        # scandown(best_version.childNodes)
+
         try:
             url = best_version.getElementsByTagName('url')[0].childNodes[0].nodeValue
             # log(url)
         except Exception as e:
             # log('Error: ', e)
-            log(best_version, file)
-            log(best_version.getElementsByTagName('url'), file)
-            log(f'ERROR! Video id:{video_id}, index: {i}', file)
+            log(best_version, log_file)
+            log(best_version.getElementsByTagName('url'), log_file)
+            log(f'ERROR! Video id:{video_id}, index: {i}', log_file)
             continue
         video_format = best_version.getElementsByTagName('fileFormat')[0].childNodes[0].nodeValue
         video_download_name = video_id + '.' + video_format.lower()
@@ -218,21 +236,25 @@ def crawl_and_download(client_key: str, start_id: int, start_index: int, max_n: 
 
         if video_size == 0:
             log(f'Video {i}/{len(videos_nodes)}, Id:{video_id}, failed to download file. (Probably too many requests)',
-                file)
+                log_file)
             denied_requests += 1
         else:
             log(f'Video {i}/{len(videos_nodes)}, Id:{video_id}, request successful with size {sizeof_fmt(video_size)}',
-                file)
+                log_file)
         total_size += video_size
         successful_requests += 1
-        file.close()
 
-    with open('probing.log', 'a+') as file:
-        log(f'Total size: {total_size}', file)
-        log(f'Total size: {sizeof_fmt(total_size)}', file)
-        log(f'Number of successful requests:{successful_requests}', file)
-        log(f'Number of denied requests:{denied_requests}', file)
-        log(f'Number of failed requests:{failed_requests}', file)
+    if log_file_path and not log_file:
+        log_file = open(os.path.join(log_file_path, LOG_NAME), 'a+')
+
+    log(f'Total size: {total_size}', log_file)
+    log(f'Total size: {sizeof_fmt(total_size)}', log_file)
+    log(f'Number of successful requests:{successful_requests}', log_file)
+    log(f'Number of denied requests:{denied_requests}', log_file)
+    log(f'Number of failed requests:{failed_requests}', log_file)
+
+    if log_file:
+        log_file.close()
 
 
 if __name__ == "__main__":
@@ -242,12 +264,14 @@ if __name__ == "__main__":
     parser.add_argument("start_id", type=str,
                         help="The Downloader will start the downloads from this video id", default=None)
     parser.add_argument("limit", type=int,
-                        help="Limit of videos to download", default=10000000)
+                        help="Limit of videos to download", default=10)
     parser.add_argument("start_index",
                         help="The Downloader will start the downloads from a said number of videos", type=int,
                         default=0)
     parser.add_argument("save_dir", type=str,
                         help="The path to the save_dir in which to save the downloads", default='./rnp_downloads/')
+    parser.add_argument("log_path", type=str,
+                        help="Path to save the logs. Optional. e.g. './'", default=None)
     args = parser.parse_args()
 
-    crawl_and_download(CLIENT_KEY, args.start_id, args.limit, args.start_index, args.save_dir)
+    crawl_and_download(CLIENT_KEY, args.start_id, args.limit, args.start_index, args.save_dir, args.log_path)

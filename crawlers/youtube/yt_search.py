@@ -4,7 +4,7 @@ import argparse
 
 
 def search(query: list, save_dir: str, max_n, wait_time: int = 10):
-    '''Performs a query in youtube then downloads every video to the save save_dir.
+    """Performs a query in youtube then downloads every video to the save save_dir.
 
     :param query: The query strings list, can contain a single string (e.g. ['beach']) or multiple strings (e.g. ['boxing','MMA']).
     :type query: list, optional
@@ -20,7 +20,7 @@ def search(query: list, save_dir: str, max_n, wait_time: int = 10):
 
     :returns: None, It automatically saves the videos to the save save_dir.
     :rtype: None
-    '''
+    """
     with youtube_dl.YoutubeDL(
             {
                 "sleep_interval": wait_time,
@@ -43,7 +43,7 @@ def search(query: list, save_dir: str, max_n, wait_time: int = 10):
 
 
 def main(query_word: str, save_dir: str, max_n, wait_time: int = 10):
-    '''Performs a query in youtube then downloads every video to the save save_dir.
+    """Performs a query in youtube then downloads every video to the save save_dir.
 
     :param query_word: The query string, can only be a single string (e.g. "beach") .
     :type query: str, optional
@@ -59,7 +59,7 @@ def main(query_word: str, save_dir: str, max_n, wait_time: int = 10):
 
     :returns: None, It automatically saves the videos to the save save_dir.
     :rtype: None
-    '''
+    """
     # Create save dir
     save_dir = save_dir + '/' + query_word + '_videos'
 

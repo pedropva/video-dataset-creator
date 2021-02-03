@@ -8,7 +8,7 @@ from time import sleep
 # https://www.youtube.com/watch?v=sQ3aeclQ3QA
 # /media/pedropva/datasets/yt_videos/sQ3aeclQ3QA.mp4
 def already_downloaded(url: str, save_dir: str):
-    '''Checks (from the url) if a video was already downloaded in the save save_dir.
+    """Checks (from the url) if a video was already downloaded in the save save_dir.
 
     :param url: Youtube Url for the video.
     :type url: str, optional
@@ -18,7 +18,7 @@ def already_downloaded(url: str, save_dir: str):
 
     :returns: A boolean, True if the video already exists in the save dir, False otherwise.
     :rtype: bool
-    '''
+    """
     video_id = url.split('v=')[-1]
     video_path = save_dir + video_id
     if os.path.isfile(video_path + '.mp4') or os.path.isfile(video_path + '.webm'):
@@ -28,7 +28,7 @@ def already_downloaded(url: str, save_dir: str):
 
 
 def download(url: str, save_dir: str):
-    '''Downloads a video from the provided url.
+    """Downloads a video from the provided url.
 
     :param url: Youtube Url for the video.
     :type url: str, optional
@@ -38,7 +38,7 @@ def download(url: str, save_dir: str):
 
     :returns: A boolean, True if the it had success downloading the video, False otherwise.
     :rtype: bool
-    '''
+    """
     try:
         options = {
             # 'verbose': True,
@@ -64,8 +64,9 @@ def download(url: str, save_dir: str):
         print(e)
         return False
 
-def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int =30):
-    '''Downloads a video from a csv containing youtube urls. One url per line.
+
+def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int = 30):
+    """Downloads a video from a csv containing youtube urls. One url per line.
 
     :param csv_path: Path to the csv file with the urls to youtube.
     :type csv_path: str, optional
@@ -78,7 +79,7 @@ def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int =3
 
     :returns: A boolean, True if the it had success downloading the video, False otherwise.
     :rtype: bool
-    '''
+    """
 
     # Creating the save save_dir
     if not os.path.exists(save_dir):
@@ -90,7 +91,7 @@ def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int =3
     raw = [v.replace(',', '') for v in raw if v != '']
     # raw = raw[:5500]
 
-    urls_to_download = [url for url in raw if already_downloaded(url)]
+    urls_to_download = [url for url in raw if not already_downloaded(url, save_dir)]
     print(f"{len(raw) - len(urls_to_download)} Videos already downloaded!")
 
     # try to download all urls until many consecutive fails or done dowloading all.
@@ -104,7 +105,7 @@ def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int =3
         # Try to download each video
         for url in urls_to_download:
             print('Downloading from url:', url)
-            result = download(url)
+            result = download(url, save_dir)
             if not result:
                 print('### Failed downloading video! ###')
                 fails_sequence += 1
@@ -121,6 +122,7 @@ def read_csv_and_download_videos(csv_path: str, save_dir: str, wait_time: int =3
         print(f'There are {len(raw) - len(urls_to_download)} out of {len(raw)} videos downloaded!')
 
         sleep(wait_time)
+
 
 if __name__ == "__main__":
     # Defining the script's arguments

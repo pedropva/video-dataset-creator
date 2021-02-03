@@ -14,6 +14,8 @@ def test_search():
     #Download some videos for testing purposes
     search(test_query, test_save_dir, max_n = 2, wait_time = 0)
 
+    # Checking if the videos were successfully downloaded
     utils.check_videos(test_save_dir, expected_number_of_videos = 2)
 
+    # Clean up test files
     utils.clean_temporary_dir(test_save_dir)
