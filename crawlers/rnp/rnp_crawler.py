@@ -1,3 +1,26 @@
+"""VideoAtRNP Crawler
+
+Author: Pedro Vinicius Almeida de Freitas
+
+Created in: 10/01/2021
+
+This tool uses the VideoAtRNP API to search for all videos in the platform and
+download them. The user can select any number of videos to download from the platform.
+The VideoAtRNP site is mainly a educational videos hosting platform.
+
+This tool requires `requests` to be installed within the Python
+environment you are running this tool in.
+
+This file can also be imported as a module and contains the following
+functions:
+
+    * sizeof_fmt - Formats number of bytes to a human readable string.
+    * scandown - Scan and print a xml tree.
+    * log - Rudimentary logging function.
+    * download_file - Downloads a file from the provided url.
+    * crawl_and_download - Crawls the VideoAtRNP API, collecting and downloading video data.
+"""
+
 import requests
 import os
 import sys
@@ -7,11 +30,15 @@ import datetime
 import argparse
 
 # Please put your client key here
-CLIENT_KEY = None
+CLIENT_KEY = 'YOUR KEY HERE'
 
 
 def sizeof_fmt(n_bytes: int, suffix: str = 'B'):
     """Formats number of bytes to a human readable string.
+    Function by: Fred Cirera and Wai Ha Lee
+    Sources:
+    https://stackoverflow.com/questions/1094841/get-human-readable-version-of-file-size
+    https://web.archive.org/web/20111010015624/http://blogmag.net/blog/read/38/Print_human_readable_file_size
 
     :param n_bytes: Number of bytes to format.
     :type n_bytes: int, optional
@@ -30,7 +57,7 @@ def sizeof_fmt(n_bytes: int, suffix: str = 'B'):
 
 
 def scandown(elements, indent=0):
-    """Scan and print a xml tree
+    """Scan and print a xml tree.
 
     :param elements: a Xml.dom node or a list of nodes.
 
@@ -67,7 +94,7 @@ def log(string: str, file=None):
         file.write(string + '\n')
 
 
-def downloadFile(url: str, save_dir: str, local_filename: str = None, verbose: bool = True):
+def download_file(url: str, save_dir: str, local_filename: str = None, verbose: bool = True):
     """Downloads a file from the provided url.
 
     :param url: Url for the file.
@@ -232,7 +259,7 @@ def crawl_and_download(client_key: str, save_dir: str, start_id: int = None, sta
         # log(video_download_name)
         # r = requests.get(url, stream=True)
         # video_size = int(r.headers.get('content-length'))
-        video_size = downloadFile(url, SAVE_DIR, local_filename=video_download_name, verbose=False)
+        video_size = download_file(url, SAVE_DIR, local_filename=video_download_name, verbose=False)
 
         if video_size == 0:
             log(f'Video {i}/{len(videos_nodes)}, Id:{video_id}, failed to download file. (Probably too many requests)',

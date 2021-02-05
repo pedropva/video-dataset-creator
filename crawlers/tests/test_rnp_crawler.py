@@ -2,7 +2,7 @@ from crawlers.rnp.rnp_crawler import \
     log, \
     crawl_and_download, \
     scandown, \
-    downloadFile, \
+    download_file, \
     sizeof_fmt
 
 from crawlers.tests import utils
@@ -52,7 +52,7 @@ def test_download_file():
     utils.create_dir(test_save_dir)
 
     # Download a video for testing purposes
-    assert downloadFile(url, test_save_dir) > 0, 'File size should be greater than zero.'
+    assert download_file(url, test_save_dir) > 0, 'File size should be greater than zero.'
 
     # Checking if the video was successfully downloaded
     utils.check_videos(test_save_dir, expected_number_of_videos=1)

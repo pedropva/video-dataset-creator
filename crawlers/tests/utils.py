@@ -1,4 +1,19 @@
-import os
+"""Utils for testing
+
+Author: Pedro Vinicius Almeida de Freitas
+
+Created in: 15/01/2021
+
+This module provides handy functions to create, check and
+clean temporary files for automated testing.
+
+This file contains the following functions:
+
+    * create_dir - Creates a temporary directory
+    * check_videos - Checks if videos were successfully downloaded
+    * clean_temporary_dir - Cleans the temporary directory and deletes it
+"""
+
 from glob import glob
 import os
 

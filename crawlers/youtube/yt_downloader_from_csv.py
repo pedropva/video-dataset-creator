@@ -1,7 +1,28 @@
+"""Youtube downloader from csv
+
+Author: Pedro Vinicius Almeida de Freitas
+
+Created in: 05/01/2021
+
+This tool takes a Comma Separated Values file with youtube videos URLS as input
+and downloads them to the specified directory. It avoids downloading videos that
+are already in the destination folder.
+
+This tool requires `youtube_dl` to be installed within the Python
+environment you are running this tool in.
+
+This file can also be imported as a module and contains the following
+functions:
+
+    * already_downloaded - Tests if the video was already downloaded.
+    * download - Downloads a video from a URL.
+    * read_csv_and_download_videos - Collects URLs from a csv file and downloads them.
+"""
+
 import os
 import youtube_dl
 import argparse
-from multiprocessing import Pool
+#from multiprocessing import Pool
 from time import sleep
 
 

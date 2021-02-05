@@ -1,3 +1,23 @@
+"""Youtube Search
+
+Author: Pedro Vinicius Almeida de Freitas
+
+Created in: 09/01/2021
+
+This tool takes a string as input and uses the google search engine to
+look for videos related to the input. Additionally it also downloads the videos
+in the search results.
+
+This tool requires `youtube_dl` to be installed within the Python
+environment you are running this tool in.
+
+This file can also be imported as a module and contains the following
+functions:
+
+    * search - Performs a query in youtube then downloads every video to the save save_dir.
+    * main - The main function of the script.
+"""
+
 import os
 import youtube_dl
 import argparse
