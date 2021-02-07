@@ -16,6 +16,7 @@ O projeto contém dois diretórios: _docs_, que contém os arquivos para geraç�
 
 Arvore de arquivos do projeto:
 
+```bash
 video-dataset-creator/
 ├── crawlers/
 │     ├── __init__.py
@@ -59,6 +60,7 @@ video-dataset-creator/
 ├── Pipfile
 ├── Pipfile.lock
 └── README.md
+```
 
 Documentação para o Usuário
 ===========================
@@ -122,20 +124,20 @@ criará uma pasta chamada *Dança\_videos/* na pasta *home* do usuário
 vídeos baixados.
 
 Há uma opção para ajuda, caso o usuário tenha alguma dúvida sobre quais
-argumentos usar, como mostra a Figura [fig:help~s~earch]
+argumentos usar, como mostra a Figura seguinte
 
 ![Página de ajuda da ferramenta Youtube
-Search.](img/yt_search_help.png "fig:") [fig:help~s~earch]
+Search.](img/yt_search_help.png "fig:")
 
 Em casos de termos de busca compostos por mais de uma palavra é
 necessário que o usuário utilize aspas duplas para demarcar o termo. Em
 termos de busca simples (com apenas uma palavra), as aspas não são
-necessárias. A Figura [fig:execucao~s~earch] mostra um exemplo de
+necessárias. A Figura seguinte mostra um exemplo de
 execução da ferramenta, buscando por um termo de busca composto (“Sphinx
 cat”).
 
 ![Exemplo de execução da ferramenta para busca e coleta de videos no
-Youtube.](img/download_yt_search.png "fig:") [fig:execucao~s~earch]
+Youtube.](img/download_yt_search.png "fig:") 
 
 O uso da ferramenta *Youtube Downloader from CSV* é similar, basta usar
 o seguinte comando enquanto dentro de um terminal pipenv (*pipenv
@@ -150,19 +152,17 @@ na pasta *home* do usuário, a ferramenta a criará e salvará os vídeos
 coletados nela.
 
 Há uma opção para ajuda e consulta, como mostra a Figura
-[fig:help~d~ownloader]
+seguinte
 
 ![Página de ajuda da ferramenta Youtube Downloader from
-CSV.](img/yt_downloader_from_csv_help.png "fig:") [fig:help~d~ownloader]
+CSV.](img/yt_downloader_from_csv_help.png "fig:")
 
 A ferramenta também tentará fazer download de quaisquer vídeos na lista
-que ainda não tenham sido baixados, como mostra a Figura
-[fig:execucao~d~ownloader]
+que ainda não tenham sido baixados, como mostra a Figura seguinte:
 
 ![Exemplo de execução da ferramenta para coleta de vídeos no Youtube a
 partir de um arquivo
 CSV.](img/download_missing_yt_downloader_from_csv.png "fig:")
-[fig:execucao~d~ownloader]
 
 Executando a ferramenta para coleta na plataforma Video@RNP {#sec:user_rnp}
 -----------------------------------------------------------
@@ -213,20 +213,19 @@ vídeos baixados:
     dados de sua execução.
 
 Há uma opção para ajuda e consulta de argumentos, como mostra a Figura
-[fig:help~r~np]
+seguinte:
 
 ![Página de ajuda da ferramenta RNP
-Crawler.](img/rnp_crawler_help.png "fig:") [fig:help~r~np]
+Crawler.](img/rnp_crawler_help.png "fig:")
 
 A ferramenta foi feita com a intenção de baixar todos os vídeos da
 plataforma. Ela também evita automaticamente coletar vídeos que já foram
-baixados. A Figura [fig:execucao~r~np] mostra um exemplo de execução da
+baixados. A Figura seguinte mostra um exemplo de execução da
 ferramenta, coletando 3 vídeos, sendo que dois deles já estavam
 baixados.
 
 ![Exemplo de execução da ferramenta para coleta de vídeos da plataforma
 Video@RNP.](img/download_missing_rnp_crawler.png "fig:")
-[fig:execucao~r~np]
 
 [^1]: https://github.com/pedropva/video-dataset-creator
 
