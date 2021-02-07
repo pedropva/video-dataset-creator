@@ -8,6 +8,8 @@ São suportadas duas plataformas de hospedagem de vídeos: [Youtube](https://www
 
 Cada ferramenta foi implementada utilizando a linguagem Python (Versão 3.6.12), utilizando o gerenciador de pacotes Pipenv (versão 2020.11.15), que torna a instalação das ferramentas e dependências mais conveniente.
 
+Mais detalhes da modelagem e desenvolvimento dessas ferramentas podem ser encontradas no [Relatório](https://github.com/pedropva/video-dataset-creator/blob/main/video-dataset-creator-relatorio.pdf)
+
 O projeto contém dois diretórios: _docs_, que contém os arquivos para geração da documentação do projeto, e crawlers, esta, por sua vez é divida em três módulos: 
 
 - rnp: Contém o crawler focado na plataforma Video@RNP.
