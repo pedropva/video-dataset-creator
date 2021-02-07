@@ -30,7 +30,7 @@ import datetime
 import argparse
 
 # Please put your client key here
-CLIENT_KEY = 'YOUR KEY HERE'
+CLIENT_KEY = None
 
 
 def sizeof_fmt(n_bytes: int, suffix: str = 'B'):
@@ -171,6 +171,10 @@ def crawl_and_download(client_key: str, save_dir: str, start_id: int = None, sta
     :returns: None, It automatically saves the videos to the save save_dir.
     :rtype: None
     """
+    # Creating the save save_dir
+    if not os.path.exists(save_dir):
+        print("Save dir not found, creating save dir in:", save_dir)
+        os.makedirs(save_dir)
 
     # Defining the requests user agent and headers
     PARAMS = {'limit': max_n}  # {'address': location}
@@ -288,17 +292,27 @@ if __name__ == "__main__":
     # Defining the script's arguments
     parser = argparse.ArgumentParser()
     # Video 20827/31366, Id:23097, error in request: 404 Not Found.
-    parser.add_argument("start_id", type=str,
-                        help="The Downloader will start the downloads from this video id", default=None)
-    parser.add_argument("limit", type=int,
-                        help="Limit of videos to download", default=10)
-    parser.add_argument("start_index",
-                        help="The Downloader will start the downloads from a said number of videos", type=int,
-                        default=0)
     parser.add_argument("save_dir", type=str,
                         help="The path to the save_dir in which to save the downloads", default='./rnp_downloads/')
-    parser.add_argument("log_path", type=str,
-                        help="Path to save the logs. Optional. e.g. './'", default=None)
+    parser.add_argument("--key", type=str,
+                        help="Your Video@RNP API access key. You can also provide it by putting it in the start of this script.", default=None)
+    parser.add_argument("--start_id", type=str,
+                        help="The Downloader will start the downloads from this video id", default=None)
+    parser.add_argument("--limit", type=int,
+                        help="Limit of videos to download", default=1000000)
+    parser.add_argument("--start_index",
+                        help="The Downloader will start the downloads from a said number of videos", type=int,
+                        default=0)
+    parser.add_argument("--log_path", type=str,
+                        help="Path to save the logs. e.g. './'", default=None)
     args = parser.parse_args()
 
-    crawl_and_download(CLIENT_KEY, args.start_id, args.limit, args.start_index, args.save_dir, args.log_path)
+    key = None
+    if CLIENT_KEY:
+        key = CLIENT_KEY
+    elif args.key:
+        key = args.key
+    else:
+        quit('Please provide your API key either via arguments or in the start of this script.')
+
+    crawl_and_download(client_key=key, save_dir=args.save_dir, start_id=args.start_id, start_index=args.start_index, max_n=args.limit, log_file_path=args.log_path)

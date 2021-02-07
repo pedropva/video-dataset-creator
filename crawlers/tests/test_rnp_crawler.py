@@ -9,7 +9,7 @@ from crawlers.tests import utils
 import os, pickle
 
 test_save_dir = './tmp/'
-CLIENT_KEY = 'YOUR KEY HERE'
+CLIENT_KEY = None
 
 
 def test_log():
